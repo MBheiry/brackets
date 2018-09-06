@@ -21,9 +21,6 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define */
-
 define({
 
     /**
@@ -131,7 +128,7 @@ define({
     "SAVE_CLOSE_MESSAGE"                : "Vai vēlaties saglabāt veiktās izmaiņas dokumentā <span class='dialog-filename'>{0}</span>?",
     "SAVE_CLOSE_MULTI_MESSAGE"          : "Vai vēlaties saglabāt izmaiņas šajās datnēs?",
     "EXT_MODIFIED_TITLE"                : "Ārējas izmaiņas",
-    "CONFIRM_FOLDER_DELETE_TITLE"       : "Apstiprināt dzēšanu",
+    "CONFIRM_DELETE_TITLE"              : "Apstiprināt dzēšanu",
     "CONFIRM_FOLDER_DELETE"             : "Vai tiešām vēlaties izdzēst mapi <span class='dialog-filename'>{0}</span>?",
     "FILE_DELETED_TITLE"                : "Datne izdzēsta",
     "EXT_MODIFIED_WARNING"              : "<span class='dialog-filename'>{0}</span> ir pārveidots diskā ārpus {APP_NAME}.<br /><br />Vai vēlaties saglabāt datni un pārrakstīt šīs izmaiņas?",
@@ -452,7 +449,7 @@ define({
     "ABOUT_TEXT_LINE4"                     : "Dokumentācija un avots <a href='https://github.com/adobe/brackets/'>https://github.com/adobe/brackets/</a>",
     "ABOUT_TEXT_LINE5"                     : "Izveidots ar \u2764 un JavaScript, autors:",
     "ABOUT_TEXT_LINE6"                     : "Daudz cilvēku (bet mums šobrīd ir grūtības ielādēt šos datus).",
-    "ABOUT_TEXT_WEB_PLATFORM_DOCS"         : "Tīmekļa platformas dokumenti un tīmekļa platformas grafiskais logo ir licencēti saskaņā ar \"Creative Commons\" licenci <a href='{WEB_PLATFORM_DOCS_LICENSE}'>CC-BY 3.0 Unported</a>.",
+    "ABOUT_TEXT_MDN_DOCS"                  : "MDN dokumenti un MDN grafiskais logo ir licencēti saskaņā ar \"Creative Commons\" licenci <a href='{MDN_DOCS_LICENSE}'>CC-BY-SA 2.5 Unported</a>.",
     "UPDATE_NOTIFICATION_TOOLTIP"          : "{APP_NAME} ir pieejams jauns būvējums! Spiediet šeit, lai saņemtu sīkāku informāciju.",
     "UPDATE_AVAILABLE_TITLE"               : "Pieejams atjauninājums",
     "UPDATE_MESSAGE"                       : "{APP_NAME} ir pieejams jauns būvējums. Dažas no jaunajām funkcijām:",
@@ -663,7 +660,7 @@ define({
     // extensions/default/RecentProjects
     "CMD_TOGGLE_RECENT_PROJECTS"                : "Nesenie projekti",
 
-    // extensions/default/WebPlatformDocs
+    // extensions/default/MDNDocs
     "DOCS_MORE_LINK"                            : "Lasīt vairāk",
 
     // extensions/default/CodeFolding

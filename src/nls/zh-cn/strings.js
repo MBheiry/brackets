@@ -21,9 +21,6 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define */
-
 define({
 
     /**
@@ -131,7 +128,7 @@ define({
     "SAVE_CLOSE_MESSAGE"                : "保存 <span class='dialog-filename'>{0}</span> 文件中所做的修改？",
     "SAVE_CLOSE_MULTI_MESSAGE"          : "是否保存以下文件的修改？",
     "EXT_MODIFIED_TITLE"                : "外部文件发生变化",
-    "CONFIRM_FOLDER_DELETE_TITLE"       : "删除确认",
+    "CONFIRM_DELETE_TITLE"              : "删除确认",
     "CONFIRM_FOLDER_DELETE"             : "确认要删除目录 <span class='dialog-filename'>{0}</span>？",
     "FILE_DELETED_TITLE"                : "文件已删除",
     "EXT_MODIFIED_WARNING"              : "<span class='dialog-filename'>{0}</span> 已产生了外部修改，<br /><br />是否保存并覆盖外部修改？",
@@ -453,7 +450,7 @@ define({
     "ABOUT_TEXT_LINE4"                     : "文档与源码在 <a href='https://github.com/adobe/brackets/'>https://github.com/adobe/brackets/</a>",
     "ABOUT_TEXT_LINE5"                     : "基于 \u2764 和 JavaScript 由以下用户参与贡献设计:",
     "ABOUT_TEXT_LINE6"                     : "有相当多的人参与其中, 但现在有一些问题导致加载不出, 你可以到GitHub上去看。",
-    "ABOUT_TEXT_WEB_PLATFORM_DOCS"         : "Web 平台文档和图形 logo 遵循<a href='{WEB_PLATFORM_DOCS_LICENSE}'>署名-相同方式共享 3.0 未本地化</a>协议。",
+    "ABOUT_TEXT_MDN_DOCS"                  : "MDN 文档和图形 logo 遵循<a href='{MDN_DOCS_LICENSE}'>署名-相同方式共享 3.0 未本地化</a>协议。",
     "UPDATE_NOTIFICATION_TOOLTIP"          : "有一个新版本的 {APP_NAME}! 点此查看详情。",
     "UPDATE_AVAILABLE_TITLE"               : "可用的更新",
     "UPDATE_MESSAGE"                       : "有一个新版本的 {APP_NAME}，增加了一些功能：",
@@ -664,7 +661,7 @@ define({
     // extensions/default/RecentProjects
     "CMD_TOGGLE_RECENT_PROJECTS"                : "最近的项目",
 
-    // extensions/default/WebPlatformDocs
+    // extensions/default/MDNDocs
     "DOCS_MORE_LINK"                            : "更多信息",
 
     // extensions/default/CodeFolding
@@ -754,7 +751,7 @@ define({
     "DESCRIPTION_PROXY"                              : "扩展安装所用的代理服务器 URL",
     "DESCRIPTION_SCROLL_PAST_END"                    : "值为真时，允许滚动超出文档末尾",
     "DESCRIPTION_SHOW_CODE_HINTS"                    : "值为假时，关闭所有代码提示",
-    "DESCRIPTION_SHOW_CURSOR_WHEN_SELECTING"         : "有蚊子选区时保持光标闪烁",
+    "DESCRIPTION_SHOW_CURSOR_WHEN_SELECTING"         : "有文字选区时保持光标闪烁",
     "DESCRIPTION_SHOW_LINE_NUMBERS"                  : "值为真时，在代码左侧显示行号",
     "DESCRIPTION_SMART_INDENT"                       : "生成新区域时自动缩进",
     "DESCRIPTION_SOFT_TABS"                          : "值为假时，关闭软 tab 功能",
@@ -790,4 +787,4 @@ define({
     "DESCRIPTION_RECENT_FILES_NAV"                   : "开启/关闭最近文件导航"
 });
 
-/* Last translated for 0e7d6bc04c6f9d3035fec72bed72e393635b234c */
+/* Last translated for ae015b5be491e1d97d86b1f7f4fd352157063110 */

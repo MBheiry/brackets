@@ -21,9 +21,6 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, brackets, $ */
-
 define(function (require, exports, module) {
     "use strict";
 
@@ -48,7 +45,10 @@ define(function (require, exports, module) {
         var result = new $.Deferred();
 
         HealthDataManager.getHealthData().done(function (healthDataObject) {
-            var content = JSON.stringify(healthDataObject, null, 4);
+            var combinedHealthAnalyticsData = HealthDataManager.getAnalyticsData(),
+                content;
+            combinedHealthAnalyticsData = [healthDataObject, combinedHealthAnalyticsData ];
+            content = JSON.stringify(combinedHealthAnalyticsData, null, 4);
             content = _.escape(content);
             content = content.replace(/ /g, "&nbsp;");
             content = content.replace(/(?:\r\n|\r|\n)/g, "<br />");

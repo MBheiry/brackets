@@ -21,10 +21,6 @@
  *
  */
 
-
-/*jslint regexp: true, vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, $ */
-
 define(function (require, exports, module) {
     "use strict";
 
@@ -43,6 +39,7 @@ define(function (require, exports, module) {
         MultiRangeInlineEditor  = require("editor/MultiRangeInlineEditor"),
         Strings                 = require("strings"),
         ViewUtils               = require("utils/ViewUtils"),
+        HealthLogger            = require("utils/HealthLogger"),
         _                       = require("thirdparty/lodash");
 
     var _newRuleCmd,
@@ -172,6 +169,14 @@ define(function (require, exports, module) {
         if (hostEditor.getLanguageForSelection().getId() !== "html") {
             return null;
         }
+
+        //Send analytics data for QuickEdit open
+        HealthLogger.sendAnalyticsData(
+            "QuickEditOpen",
+            "usage",
+            "quickEdit",
+            "open"
+        );
 
         // Only provide CSS editor if the selection is within a single line
         var sel = hostEditor.getSelection();

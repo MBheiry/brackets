@@ -21,10 +21,6 @@
  *
  */
 
-
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define */
-
 /**
  * FileIndex is an internal module used by FileSystem to maintain an index of all files and directories.
  *
@@ -32,6 +28,8 @@
  */
 define(function (require, exports, module) {
     "use strict";
+
+    var FileUtils = require("file/FileUtils");
 
     /**
      * @constructor
@@ -114,7 +112,9 @@ define(function (require, exports, module) {
      */
     FileIndex.prototype.entryRenamed = function (oldPath, newPath, isDirectory) {
         var path,
-            renameMap = {};
+            renameMap = {},
+            oldParentPath = FileUtils.getParentPath(oldPath),
+            newParentPath = FileUtils.getParentPath(newPath);
 
         // Find all entries affected by the rename and put into a separate map.
         for (path in this._index) {
@@ -140,6 +140,30 @@ define(function (require, exports, module) {
                 delete this._index[path];
                 this._index[renameMap[path]] = item;
                 item._setPath(renameMap[path]);
+            }
+        }
+
+
+        // If file path is changed, i.e the file is moved
+        // Remove the moved entry from old Directory and add it to new Directory
+        if (oldParentPath !== newParentPath) {
+            var oldDirectory = this._index[oldParentPath],
+                newDirectory = this._index[newParentPath],
+                renamedEntry;
+
+            if (oldDirectory && oldDirectory._contents) {
+                oldDirectory._contents = oldDirectory._contents.filter(function(entry) {
+                    if (entry.fullPath === newPath) {
+                        renamedEntry = entry;
+                        return false;
+                    }
+                    return true;
+                });
+            }
+
+            if (newDirectory && newDirectory._contents && renamedEntry) {
+                renamedEntry._setPath(newPath);
+                newDirectory._contents.push(renamedEntry);
             }
         }
     };

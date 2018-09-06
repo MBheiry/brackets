@@ -21,10 +21,6 @@
  *
  */
 
-
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, $, window */
-
 /**
  * EditorManager owns the UI for the editor area. This essentially mirrors the 'current document'
  * property maintained by DocumentManager's model.
@@ -241,7 +237,7 @@ define(function (require, exports, module) {
         //    but reason it could not create InlineWidget
         //
         // Keep looping until a provider is found. If a provider is not found,
-        // display highest priority error message that was found, otherwise display
+        // display the highest priority error message that was found, otherwise display
         // default error message
         for (i = 0; i < providers.length && !inlinePromise; i++) {
             var provider = providers[i].provider;
@@ -604,7 +600,7 @@ define(function (require, exports, module) {
     }
 
     /**
-     * @deprecated There is no equivelent API moving forward.
+     * @deprecated There is no equivalent API moving forward.
      * Use MainViewManager._initialize() from a unit test to create a Main View attached to a specific DOM element
      */
     function setEditorHolder() {

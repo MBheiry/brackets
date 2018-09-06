@@ -21,10 +21,6 @@
  *
  */
 
-
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, brackets, $ */
-
 define(function (require, exports, module) {
     "use strict";
 
@@ -35,7 +31,8 @@ define(function (require, exports, module) {
         LanguageManager         = brackets.getModule("language/LanguageManager"),
         PerfUtils               = brackets.getModule("utils/PerfUtils"),
         ProjectManager          = brackets.getModule("project/ProjectManager"),
-        Strings                 = brackets.getModule("strings");
+        Strings                 = brackets.getModule("strings"),
+        HealthLogger            = brackets.getModule("utils/HealthLogger");
 
     /**
      * Return the token string that is at the specified position.
@@ -200,6 +197,13 @@ define(function (require, exports, module) {
             return null;
         }
 
+        //Send analytics data for Quick Edit open
+        HealthLogger.sendAnalyticsData(
+            "QuickEditOpen",
+            "usage",
+            "quickEdit",
+            "open"
+        );
         // Only provide JavaScript editor if the selection is within a single line
         var sel = hostEditor.getSelection();
         if (sel.start.line !== sel.end.line) {

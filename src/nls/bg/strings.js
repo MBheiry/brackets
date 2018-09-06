@@ -21,9 +21,6 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define */
-
 define({
 
     /**
@@ -131,7 +128,7 @@ define({
     "SAVE_CLOSE_MESSAGE"                : "Искате ли да запазите промените, които направихте в документа <span class='dialog-filename'>{0}</span>?",
     "SAVE_CLOSE_MULTI_MESSAGE"          : "Искате ли да запазите промените си в следните файлове?",
     "EXT_MODIFIED_TITLE"                : "Външни промени",
-    "CONFIRM_FOLDER_DELETE_TITLE"       : "Потвърждаване на изтриването",
+    "CONFIRM_DELETE_TITLE"              : "Потвърждаване на изтриването",
     "CONFIRM_FOLDER_DELETE"             : "Наистина ли искате да изтриете папката <span class='dialog-filename'>{0}</span>?",
     "FILE_DELETED_TITLE"                : "Изтрит файл",
     "EXT_MODIFIED_WARNING"              : "Файлът <span class='dialog-filename'>{0}</span> беше променен извън {APP_NAME}.<br /><br />Искате ли да запазите файла и да презапишете промените му?",
@@ -452,7 +449,7 @@ define({
     "ABOUT_TEXT_LINE4"                     : "Документацията и изходният код могат да бъдат открити тук: <a href='https://github.com/adobe/brackets/'>https://github.com/adobe/brackets/</a>",
     "ABOUT_TEXT_LINE5"                     : "Създадено с \u2764 и JavaScript от:",
     "ABOUT_TEXT_LINE6"                     : "Много хора (но в момента не може да заредим данните за тях).",
-    "ABOUT_TEXT_WEB_PLATFORM_DOCS"         : "Документацията и логото на платформата за уеб приложения са лицензирани под лиценз за признание от вида „Криейтив Комънс“: <a href='{WEB_PLATFORM_DOCS_LICENSE}'>CC-BY 3.0 Нелокализиран</a>.",
+    "ABOUT_TEXT_MDN_DOCS"                  : "Документацията и логото на MDN са лицензирани под лиценз за признание от вида „Криейтив Комънс“: <a href='{MDN_DOCS_LICENSE}'>CC-BY-SA 2.5 Нелокализиран</a>.",
     "UPDATE_NOTIFICATION_TOOLTIP"          : "Има ново издание на {APP_NAME}! Щракнете тук за подробности.",
     "UPDATE_AVAILABLE_TITLE"               : "Има ново обновление",
     "UPDATE_MESSAGE"                       : "Хей, има ново издание на {APP_NAME}. Ето някои от новите функционалности:",
@@ -663,7 +660,7 @@ define({
     // extensions/default/RecentProjects
     "CMD_TOGGLE_RECENT_PROJECTS"                : "Скорошни проекти",
 
-    // extensions/default/WebPlatformDocs
+    // extensions/default/MDNDocs
     "DOCS_MORE_LINK"                            : "Прочетете повече",
 
     // extensions/default/CodeFolding

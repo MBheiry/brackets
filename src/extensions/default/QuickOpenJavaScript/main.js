@@ -21,11 +21,6 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, $, brackets */
-
-
-
 define(function (require, exports, module) {
     "use strict";
 
@@ -70,9 +65,7 @@ define(function (require, exports, module) {
         var lines = docText.split("\n");
         var functions = JSUtils.findAllMatchingFunctionsInText(docText, "*");
         functions.forEach(function (funcEntry) {
-            var chFrom = lines[funcEntry.lineStart].indexOf(funcEntry.name);
-            var chTo = chFrom + funcEntry.name.length;
-            functionList.push(new FileLocation(null, funcEntry.lineStart, chFrom, chTo, funcEntry.name));
+            functionList.push(new FileLocation(null, funcEntry.nameLineStart, funcEntry.columnStart, funcEntry.columnEnd, funcEntry.label || funcEntry.name));
         });
         return functionList;
     }

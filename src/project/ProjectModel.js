@@ -22,7 +22,6 @@
  */
 
 /* unittests: ProjectModel */
-/*global define, brackets, $ */
 
 /**
  * Provides the data source for a project and manages the view model for the FileTreeView.
@@ -57,40 +56,58 @@ define(function (require, exports, module) {
      *    https://github.com/adobe/brackets/issues/6781
      * @type {RegExp}
      */
-    var _exclusionListRegEx = /\.pyc$|^\.git$|^\.gitmodules$|^\.svn$|^\.DS_Store$|^Thumbs\.db$|^\.hg$|^CVS$|^\.hgtags$|^\.idea$|^\.c9revisions$|^\.SyncArchive$|^\.SyncID$|^\.SyncIgnore$|\~$/;
+    var _exclusionListRegEx = /\.pyc$|^\.git$|^\.gitmodules$|^\.svn$|^\.DS_Store$|^Icon\r|^Thumbs\.db$|^\.hg$|^CVS$|^\.hgtags$|^\.idea$|^\.c9revisions$|^\.SyncArchive$|^\.SyncID$|^\.SyncIgnore$|\~$/;
+
+    /**
+     * Glob definition of files and folders that should be excluded directly
+     * inside node domain watching with chokidar
+     */
+    var defaultIgnoreGlobs = [
+        "**/(.pyc|.git|.gitmodules|.svn|.DS_Store|Thumbs.db|.hg|CVS|.hgtags|.idea|.c9revisions|.SyncArchive|.SyncID|.SyncIgnore)",
+        "**/bower_components",
+        "**/node_modules"
+    ];
 
     /**
      * @private
-     * A string containing all invalid characters for a specific platform.
-     * This will be used to construct a regular expression for checking invalid filenames.
-     * When a filename with one of these invalid characters are detected, then it is
-     * also used to substitute the place holder of the error message.
+     * RegEx to validate a file path.
      */
-    var _invalidChars;
+    var _invalidChars = /([?\*\|\<\>"]+|\/{2,}|\.{2,}|\.$)/i;
 
     /**
      * @private
      * RegEx to validate if a filename is not allowed even if the system allows it.
      * This is done to prevent cross-platform issues.
      */
-
-    var _illegalFilenamesRegEx = /^(\.+|com[1-9]|lpt[1-9]|nul|con|prn|aux|)$|\.+$/i;
+    var _illegalFilenamesRegEx = /((\b(com[0-9]+|lpt[0-9]+|nul|con|prn|aux)\b)|\.+$|\/+|\\+|\:)/i;
 
     /**
      * Returns true if this matches valid filename specifications.
+     * See http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
      *
      * TODO: This likely belongs in FileUtils.
      *
      * @param {string} filename to check
-     * @param {string} invalidChars List of characters that are disallowed
      * @return {boolean} true if the filename is valid
      */
-    function isValidFilename(filename, invalidChars) {
-        // Validate file name
-        // Checks for valid Windows filenames:
-        // See http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
-        return !((filename.search(new RegExp("[" + invalidChars + "]+")) !== -1) ||
-                 filename.match(_illegalFilenamesRegEx));
+    function isValidFilename(filename) {
+        // Fix issue adobe#13099
+        // See https://github.com/adobe/brackets/issues/13099
+        return !(
+            filename.match(_invalidChars)|| filename.match(_illegalFilenamesRegEx)
+        );
+    }
+
+    /**
+     * Returns true if given path is valid.
+     *
+     * @param {string} path to check
+     * @return {boolean} true if the filename is valid
+     */
+    function isValidPath(path) {
+        // Fix issue adobe#13099
+        // See https://github.com/adobe/brackets/issues/13099
+        return !(path.match(_invalidChars));
     }
 
     /**
@@ -98,7 +115,7 @@ define(function (require, exports, module) {
      * @see #shouldShow
      */
     function _shouldShowName(name) {
-        return !name.match(_exclusionListRegEx);
+        return !_exclusionListRegEx.test(name);
     }
 
     /**
@@ -170,9 +187,16 @@ define(function (require, exports, module) {
      */
     function doCreate(path, isFolder) {
         var d = new $.Deferred();
+        var filename = FileUtils.getBaseName(path);
 
-        var name = FileUtils.getBaseName(path);
-        if (!isValidFilename(name, _invalidChars)) {
+        // Check if filename
+        if (!isValidFilename(filename)){
+            return d.reject(ERROR_INVALID_FILENAME).promise();
+        }
+
+        // Check if fullpath with filename is valid
+        // This check is used to circumvent directory jumps (Like ../..)
+        if (!isValidPath(path)) {
             return d.reject(ERROR_INVALID_FILENAME).promise();
         }
 
@@ -797,9 +821,10 @@ define(function (require, exports, module) {
      * The Promise returned is resolved with an object with a `newPath` property with the renamed path. If the user cancels the operation, the promise is resolved with the value RENAME_CANCELLED.
      *
      * @param {string=} path optional path to start renaming
+     * @param {boolean=} isMoved optional flag which indicates whether the entry is being moved instead of renamed
      * @return {$.Promise} resolved when the operation is complete.
      */
-    ProjectModel.prototype.startRename = function (path) {
+    ProjectModel.prototype.startRename = function (path, isMoved) {
         var d = new $.Deferred();
         path = _getPathFromFSObject(path);
         if (!path) {
@@ -810,7 +835,7 @@ define(function (require, exports, module) {
         }
 
         if (this._selections.rename && this._selections.rename.path === path) {
-            return;
+            return d.resolve().promise();
         }
 
         if (!this.isWithinProject(path)) {
@@ -827,19 +852,21 @@ define(function (require, exports, module) {
             this.showInTree(path);
         }
 
-        if (path !== this._selections.context) {
-            this.setContext(path);
-        } else {
-            this.performRename();
-        }
+        if (!isMoved) {
+            if (path !== this._selections.context) {
+                this.setContext(path);
+            } else {
+                this.performRename();
+            }
 
-        this._viewModel.moveMarker("rename", null,
-                                   projectRelativePath);
+            this._viewModel.moveMarker("rename", null,
+                projectRelativePath);
+        }
         this._selections.rename = {
             deferred: d,
             type: FILE_RENAMING,
             path: path,
-            newName: FileUtils.getBaseName(path)
+            newPath: path
         };
         return d.promise();
     };
@@ -848,13 +875,13 @@ define(function (require, exports, module) {
      * Sets the new value for the rename operation that is in progress (started previously with a call
      * to `startRename`).
      *
-     * @param {string} name new name for the file or directory being renamed
+     * @param {string} newPath new path for the file or directory being renamed
      */
-    ProjectModel.prototype.setRenameValue = function (name) {
+    ProjectModel.prototype.setRenameValue = function (newPath) {
         if (!this._selections.rename) {
             return;
         }
-        this._selections.rename.newName = name;
+        this._selections.rename.newPath = newPath;
     };
 
     /**
@@ -883,22 +910,23 @@ define(function (require, exports, module) {
      * Rename a file/folder. This will update the project tree data structures
      * and send notifications about the rename.
      *
-     * @param {string} oldName Old item name
-     * @param {string} newName New item name
+     * @param {string} oldPath Old name of the item with the path
+     * @param {string} newPath New name of the item with the path
+     * @param {string} newName New name of the item
      * @param {boolean} isFolder True if item is a folder; False if it is a file.
      * @return {$.Promise} A promise object that will be resolved or rejected when
      *   the rename is finished.
      */
-    function _renameItem(oldName, newName, isFolder) {
+    function _renameItem(oldPath, newPath, newName, isFolder) {
         var result = new $.Deferred();
 
-        if (oldName === newName) {
+        if (oldPath === newPath) {
             result.resolve();
-        } else if (!isValidFilename(FileUtils.getBaseName(newName), _invalidChars)) {
+        } else if (!isValidFilename(newName)) {
             result.reject(ERROR_INVALID_FILENAME);
         } else {
-            var entry = isFolder ? FileSystem.getDirectoryForPath(oldName) : FileSystem.getFileForPath(oldName);
-            entry.rename(newName, function (err) {
+            var entry = isFolder ? FileSystem.getDirectoryForPath(oldPath) : FileSystem.getFileForPath(oldPath);
+            entry.rename(newPath, function (err) {
                 if (err) {
                     result.reject(err);
                 } else {
@@ -916,10 +944,11 @@ define(function (require, exports, module) {
      * Renames the item at the old path to the new name provided.
      *
      * @param {string} oldPath full path to the current location of file or directory (should include trailing slash for directory)
+     * @param {string} newPath full path to the new location of the file or directory
      * @param {string} newName new name for the file or directory
      */
-    ProjectModel.prototype._renameItem = function (oldPath, newName) {
-        return _renameItem(oldPath, newName, !_pathIsFile(oldPath));
+    ProjectModel.prototype._renameItem = function (oldPath, newPath, newName) {
+        return _renameItem(oldPath, newPath, newName, !_pathIsFile(oldPath));
     };
 
     /**
@@ -937,17 +966,17 @@ define(function (require, exports, module) {
             // To get the parent directory, we need to strip off the trailing slash on a directory name
             parentDirectory = FileUtils.getDirectoryPath(isFolder ? FileUtils.stripTrailingSlash(oldPath) : oldPath),
             oldName         = FileUtils.getBaseName(oldPath),
-            newName         = renameInfo.newName,
-            newPath         = parentDirectory + newName,
+            newPath         = renameInfo.newPath,
+            newName         = FileUtils.getBaseName(newPath),
             viewModel       = this._viewModel,
             self            = this;
 
-        if (renameInfo.type !== FILE_CREATING && oldName === newName) {
+        if (renameInfo.type !== FILE_CREATING && oldPath === newPath) {
             this.cancelRename();
             return;
         }
 
-        if (isFolder) {
+        if (isFolder && _.last(newPath) !== "/") {
             newPath += "/";
         }
 
@@ -959,9 +988,10 @@ define(function (require, exports, module) {
         viewModel.moveMarker("creating", oldProjectPath, null);
 
         function finalizeRename() {
-            viewModel.renameItem(oldProjectPath, newName);
+            viewModel.renameItem(oldProjectPath, self.makeProjectRelativeIfPossible(newPath));
             if (self._selections.selected && self._selections.selected.indexOf(oldPath) === 0) {
                 self._selections.selected = newPath + self._selections.selected.slice(oldPath.length);
+                self.setCurrentFile(newPath);
             }
         }
 
@@ -974,7 +1004,7 @@ define(function (require, exports, module) {
                 renameInfo.deferred.reject(error);
             });
         } else {
-            this._renameItem(oldPath, newPath).then(function () {
+            this._renameItem(oldPath, newPath, newName).then(function () {
                 finalizeRename();
                 renameInfo.deferred.resolve({
                     newPath: newPath
@@ -1332,24 +1362,17 @@ define(function (require, exports, module) {
         return welcomeProjects.indexOf(pathNoSlash) !== -1;
     }
 
-    // Init invalid characters string
-    if (brackets.platform === "mac") {
-        _invalidChars = "?*|:";
-    } else if (brackets.platform === "linux") {
-        _invalidChars = "?*|/";
-    } else {
-        _invalidChars = "/?*:<>\\|\"";  // invalid characters on Windows
-    }
-
     exports._getWelcomeProjectPath  = _getWelcomeProjectPath;
     exports._addWelcomeProjectPath  = _addWelcomeProjectPath;
     exports._isWelcomeProjectPath   = _isWelcomeProjectPath;
     exports._ensureTrailingSlash    = _ensureTrailingSlash;
     exports._shouldShowName         = _shouldShowName;
-    exports._invalidChars           = _invalidChars;
+    exports._invalidChars           = "? * | : / < > \\ | \" ..";
 
     exports.shouldShow              = shouldShow;
+    exports.defaultIgnoreGlobs      = defaultIgnoreGlobs;
     exports.isValidFilename         = isValidFilename;
+    exports.isValidPath             = isValidPath;
     exports.EVENT_CHANGE            = EVENT_CHANGE;
     exports.EVENT_SHOULD_SELECT     = EVENT_SHOULD_SELECT;
     exports.EVENT_SHOULD_FOCUS      = EVENT_SHOULD_FOCUS;

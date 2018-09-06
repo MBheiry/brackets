@@ -21,10 +21,6 @@
  *
  */
 
-
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define */
-
 define(function (require, exports, module) {
     "use strict";
 
@@ -77,6 +73,7 @@ define(function (require, exports, module) {
      */
     function Document(file, initialTimestamp, rawText) {
         this.file = file;
+        this.editable = !file.readOnly;
         this._updateLanguage();
         this.refreshText(rawText, initialTimestamp, true);
         // List of full editors which are initialized as master editors for this doc.
@@ -760,6 +757,25 @@ define(function (require, exports, module) {
      */
     Document.prototype.isUntitled = function () {
         return this.file instanceof InMemoryFile;
+    };
+
+    /**
+     *  Reloads the document from FileSystem
+     *  @return {promise} - to check if reload was successful or not
+     */
+    Document.prototype.reload = function () {
+        var $deferred = $.Deferred();
+        var self = this;
+        FileUtils.readAsText(this.file)
+            .done(function (text, readTimestamp) {
+                self.refreshText(text, readTimestamp);
+                $deferred.resolve();
+            })
+            .fail(function (error) {
+                console.log("Error reloading contents of " + self.file.fullPath, error);
+                $deferred.reject();
+            });
+        return $deferred.promise();
     };
 
     // We dispatch events from the module level, and the instance level. Instance events are wired up

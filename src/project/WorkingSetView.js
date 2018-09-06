@@ -21,10 +21,6 @@
  *
  */
 
-
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, $, window, brackets */
-
 /**
  * WorkingSetView generates the UI for the list of the files user is editing based on the model provided by EditorManager.
  * The UI allows the user to see what files are open/dirty and allows them to close files and specify the current editor.
@@ -62,6 +58,13 @@ define(function (require, exports, module) {
      * @private
      */
     var _iconProviders = [];
+
+    /**
+     * The file/folder object of the current context
+     * @type {FileSystemEntry}
+     * @private
+     */
+    var _contextEntry;
 
     /**
      * Class Providers
@@ -338,7 +341,6 @@ define(function (require, exports, module) {
                     gTop,
                     gHeight,
                     gBottom,
-                    deltaY,
                     containerOffset,
                     scrollerTopArea,
                     scrollerBottomArea;
@@ -413,7 +415,6 @@ define(function (require, exports, module) {
                 gTop = $ghost.offset().top;
                 gHeight = $ghost.height();
                 gBottom = gTop + gHeight;
-                deltaY = pageY - e.pageY;
 
                 // data to help us determine if we have a scroller
                 hasScroller = $item.length && $container.length && $container[0].scrollHeight > $container[0].clientHeight;
@@ -1113,7 +1114,6 @@ define(function (require, exports, module) {
                     data = {fullPath: file.fullPath,
                             name: file.name,
                             isFile: file.isFile};
-                $li.removeAttr("class");
                 _classProviders.forEach(function (provider) {
                     $li.addClass(provider(data));
                 });
@@ -1391,6 +1391,7 @@ define(function (require, exports, module) {
         this.$openFilesContainer.css("overflow-x", "hidden");
 
         this.$openFilesContainer.on("contextmenu.workingSetView", function (e) {
+            _contextEntry = $(e.target).closest("li").data(_FILE_KEY);
             Menus.getContextMenu(Menus.ContextMenuIds.WORKING_SET_CONTEXT_MENU).open(e);
         });
 
@@ -1472,7 +1473,7 @@ define(function (require, exports, module) {
     });
     
     /*
-     * To be used by other modules/deafult-extensions which needs to borrow working set entry icons
+     * To be used by other modules/default-extensions which needs to borrow working set entry icons
      * @param {!object} data - contains file info {fullPath, name, isFile}
      * @param {!jQuery} $element - jquery fn wrap for the list item
      */
@@ -1495,6 +1496,13 @@ define(function (require, exports, module) {
             $element.addClass(provider(data));
         });
     }
+
+    /**
+     * Gets the filesystem object for the current context in the working set.
+     */
+    function getContext() {
+        return _contextEntry;
+    }
     
     // Public API
     exports.createWorkingSetViewForPane   = createWorkingSetViewForPane;
@@ -1502,6 +1510,7 @@ define(function (require, exports, module) {
     exports.addIconProvider               = addIconProvider;
     exports.addClassProvider              = addClassProvider;
     exports.syncSelectionIndicator        = syncSelectionIndicator;
+    exports.getContext                    = getContext;
     
     // API to be used only by default extensions
     exports.useIconProviders              = useIconProviders;
